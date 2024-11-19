@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fp_tekber_kel4_notes/screens/add_note_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -19,16 +20,21 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.yellow, // Warna kuning untuk FAB
-        elevation: 0, // Hilangkan bayangan FAB
-        onPressed: () {
-          // Tambahkan aksi FAB
-        },
-        child: const Icon(
-          Icons.add,
-          color: Colors.black, // Warna ikon hitam
-        ),
+  backgroundColor: Colors.yellow,
+  elevation: 0,
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddNoteScreen(),
       ),
+    );
+  },
+  child: const Icon(
+    Icons.add,
+    color: Colors.black,
+  ),
+),
       body: const Center(
         child: Text(
           'No notes yet!',

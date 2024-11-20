@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-  backgroundColor: Colors.yellow,
+  backgroundColor: const Color.fromARGB(255, 189, 117, 202),
   elevation: 0,
   onPressed: () {
     Navigator.push(

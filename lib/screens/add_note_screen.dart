@@ -75,7 +75,7 @@ class AddNoteScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // Warna tombol hijau
+                    backgroundColor: const Color(0xFFBD75CA), // Warna tombol hijau
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -95,7 +95,9 @@ class AddNoteScreen extends StatelessWidget {
                     } else {
                       // Tampilkan pesan error
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please fill in all fields')),
+                        const SnackBar(content: Text('Please fill in all fields'),
+                        duration: Duration(seconds: 1),
+                        ),
                       );
                     }
                   },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'quicknotes.dart'; // Impor halaman Quick Notes
 
 class MyAppScreen extends StatelessWidget {
   const MyAppScreen({super.key});
@@ -61,61 +62,71 @@ class MyAppScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Quick Notes Card
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    spreadRadius: 2,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  // Image on the left side
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const QuickNotes()),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      spreadRadius: 2,
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
-                    child: Image.asset(
-                      'fp_tekber_kel4_notes/assets/quicknotes.png', // Replace with your image path
-                      fit: BoxFit.cover,
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    // Image on the left side
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Image.asset(
+                        'fp_tekber_kel4_notes/assets/quicknotes.png', // Replace with your image path
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
+                    const SizedBox(width: 16),
 
-                  // Title and Subtitle
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Quick Notes',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                    // Title and Subtitle
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Quick Notes',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Take your education notes here',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.black54,
+                        SizedBox(height: 4),
+                        Text(
+                          'Take your education notes here',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.black54,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
+
             const SizedBox(height: 16),
+
             // My Task Card
             Container(
               padding: const EdgeInsets.all(16.0),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import 'package:fp_tekber_kel4_notes/screens/myapp_screen.dart';
+import 'quicknotes_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -126,7 +127,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       width: 250 * _progress, // Animate width based on progress
                       height: 8,
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 189, 117, 202), // Progress bar color changed
+                        color: const Color.fromARGB(
+                            255, 189, 117, 202), // Progress bar color changed
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -140,13 +142,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const MyAppScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 189, 117, 202), // Button color changed
+                  backgroundColor: const Color.fromARGB(
+                      255, 189, 117, 202), // Button color changed
                   foregroundColor: Colors.white, // Font color remains white
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),

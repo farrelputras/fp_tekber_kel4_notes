@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fp_tekber_kel4_notes/screens/add_note_screen.dart';
 import 'package:get/get.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class QNotesScreen extends StatelessWidget {
+  const QNotesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fp_tekber_kel4_notes/screens/myapp_screen.dart';
 import 'screens/onboarding_screen.dart';
 
 void main() {
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true, // Aktifkan Material 3
         fontFamily: "SourGummy"
       ),
-      home: const OnboardingScreen(), // Halaman pertama
+      home: const MyAppScreen(), // Halaman pertama
     );
   }
 }

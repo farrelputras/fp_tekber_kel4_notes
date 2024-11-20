@@ -91,7 +91,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
             // Text "Welcome to Notes App!"
             const Text(
-              'Welcome to Notes App!',
+              'Welcome to EduNotes!',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Create, Edit, and Manage Your Notes Easily',
+              'Create, Edit, and Manage Your Education Notes Easily',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.black54,
@@ -154,7 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   shadowColor: Colors.black54, // Shadow hint color
                 ),
                 child: const Text(
-                  'Get Started',
+                  'Start Take Your Notes',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

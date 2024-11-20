@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  google_fonts: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -25,3 +26,12 @@ flutter:
     - assets/gambar1.png
     - assets/gambar2.png
     - assets/gambar3.png
+
+  fonts:
+    - family: SourGummy
+      fonts:
+        - asset: fonts/SourGummy-Regular.ttf
+          weight: 400
+        - asset: fonts/SourGummy-Bold.ttf
+          weight: 700
+

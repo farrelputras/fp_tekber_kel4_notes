@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.yellow), // Tema dengan warna kuning
         useMaterial3: true, // Aktifkan Material 3
+        fontFamily: "SourGummy"
       ),
       home: const OnboardingScreen(), // Halaman pertama
     );

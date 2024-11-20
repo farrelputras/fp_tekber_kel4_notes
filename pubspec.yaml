@@ -24,9 +24,12 @@ flutter:
 
   # Section to include assets
   assets:
-    - assets/gambar1.png
-    - assets/gambar2.png
-    - assets/gambar3.png
+    - assets\gambar1.png
+    - assets\gambar2.png
+    - assets\gambar3.png
+    - assets\check.png
+    - assets\folder.png
+    - assets\quicknotes.png
 
   fonts:
     - family: SourGummy

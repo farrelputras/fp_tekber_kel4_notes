@@ -85,7 +85,7 @@ class MyAppScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Image.asset(
-                      'assets/quicknotes.png', // Replace with your image path
+                      'fp_tekber_kel4_notes/assets/quicknotes.png', // Replace with your image path
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -173,7 +173,7 @@ class MyAppScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-           // My Folder Card
+            // My Folder Card
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(

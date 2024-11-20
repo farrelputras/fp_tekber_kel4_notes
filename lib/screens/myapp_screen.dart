@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fp_tekber_kel4_notes/screens/add_note_screen.dart';
-import 'package:get/get.dart';
 
 class MyAppScreen extends StatelessWidget {
   const MyAppScreen({super.key});
@@ -10,87 +8,230 @@ class MyAppScreen extends StatelessWidget {
     final TextEditingController searchController = TextEditingController();
 
     return Scaffold(
-      //Start AppBar
+      // AppBar
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(
-            255, 255, 243, 132), // Warna kuning untuk AppBar
-        centerTitle: true, // Teks judul di tengah
+        backgroundColor: const Color.fromARGB(255, 255, 243, 132),
+        elevation: 0,
+        centerTitle: true,
         title: const Text(
-          'EduNotes',
+          'EduNote!',
           style: TextStyle(
-            color: Colors.black, // Teks warna hitam
-            fontSize: 20,
+            color: Colors.black,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
 
-      //Start ActionButton
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color.fromARGB(255, 189, 117, 202),
-        elevation: 0,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AddNoteScreen(),
-            ),
-          );
-        },
-        child: const Icon(
-          Icons.add,
-          color: Colors.black,
-        ),
-      ),
-
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-          child: Column(
-            children: <Widget>[
-              const SizedBox(
-                height: 16.0,
+            // Search Bar
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
               ),
-
-              //Search Bar
-              SearchBar(
+              child: TextField(
                 controller: searchController,
-                leading: IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.search),
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.search, color: Colors.black54),
+                  hintText: 'Search Your Note',
+                  hintStyle: TextStyle(color: Colors.black54),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.all(12),
                 ),
-                hintText: 'Search Your Note',
               ),
-              const SizedBox(
-                height: 16.0,
-              ),
+            ),
 
-              //My Apps Text
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16.0),
-                  child: Text(
-                    'My Apps',
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+            const SizedBox(height: 24),
+
+            // "My Apps" Text
+            const Text(
+              'My Apps',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Quick Notes Card
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    spreadRadius: 2,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Image on the left side
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Image.asset(
+                      'assets/quicknotes.png', // Replace with your image path
+                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
+                  const SizedBox(width: 16),
+
+                  // Title and Subtitle
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Quick Notes',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Take your education notes here',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 16.0,
+            ),
+            const SizedBox(height: 16),
+            // My Task Card
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    spreadRadius: 2,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-            ],
-          ),
+              child: Row(
+                children: [
+                  // Image on the left side
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Image.asset(
+                      'assets/check.png', // Replace with your image path
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  // Title and Subtitle
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'My Task',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Track all your task here',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+           // My Folder Card
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    spreadRadius: 2,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Image on the left side
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Image.asset(
+                      'assets/folder.png', // Replace with your image path
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  // Title and Subtitle
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'My Folder',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Organize your education notes here',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-}
-
-class NavController extends GetxController {
-  final Rx<int> selectedIndex = 0.obs;
 }

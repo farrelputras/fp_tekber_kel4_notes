@@ -100,7 +100,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Create, Edit, and Manage Your Education Notes Easily',
+              'Manage ur academics note with EduNotes!: an easy way to learn!',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.black54,

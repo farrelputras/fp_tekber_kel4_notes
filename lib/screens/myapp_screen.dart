@@ -93,7 +93,7 @@ class MyAppScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Image.asset(
-                        'fp_tekber_kel4_notes/assets/quicknotes.png', // Replace with your image path
+                        'assets/quicknotes.png', // Replace with your image path
                         fit: BoxFit.cover,
                       ),
                     ),

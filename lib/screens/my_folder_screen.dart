@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'add_folder_screen.dart';
 
 class MyFolderScreen extends StatefulWidget {
   const MyFolderScreen({Key? key}) : super(key: key);
@@ -10,14 +11,18 @@ class MyFolderScreen extends StatefulWidget {
 class _MyFolderScreenState extends State<MyFolderScreen> {
   final List<Map<String, String>> folders = []; // List untuk menyimpan folder
 
-  // Tambahkan folder baru
-  void _addFolder() {
-    setState(() {
-      folders.add({
-        "name": "New Folder ${folders.length + 1}",
-        "description": "Folder description ${folders.length + 1}",
+  // Tambahkan folder dari AddFolderScreen
+  void _navigateToAddFolderScreen() async {
+    final newFolder = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AddFolderScreen()),
+    );
+
+    if (newFolder != null) {
+      setState(() {
+        folders.add(newFolder);
       });
-    });
+    }
   }
 
   // Hapus folder
@@ -54,8 +59,8 @@ class _MyFolderScreenState extends State<MyFolderScreen> {
             ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
+                  children: const [
+                    Text(
                       'No folder yet',
                       style: TextStyle(color: Colors.black54, fontSize: 16),
                     ),
@@ -113,7 +118,7 @@ class _MyFolderScreenState extends State<MyFolderScreen> {
               ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addFolder,
+        onPressed: _navigateToAddFolderScreen,
         backgroundColor: Colors.purple,
         child: const Icon(Icons.add),
       ),

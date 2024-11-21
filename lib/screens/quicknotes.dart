@@ -14,7 +14,7 @@ class QuickNotes extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          'Add New Notes',
+          'Quick Notes',
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,

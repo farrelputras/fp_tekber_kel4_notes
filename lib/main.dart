@@ -32,20 +32,20 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
         fontFamily: "SourGummy",
       ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark, // Mode gelap
-        scaffoldBackgroundColor: const Color.fromARGB(255, 51, 42, 55), // Latar belakang gelap
-        primaryColor: const Color.fromARGB(255, 113, 2, 132), // Warna utama
-        colorScheme: const ColorScheme.dark(
-          primary: Color.fromARGB(255, 205, 157, 213), // Warna elemen utama
-          secondary: Color.fromARGB(255, 59, 30, 109), // Warna elemen sekunder
+        darkTheme: ThemeData(
+          brightness: Brightness.dark, // Mode gelap
+          scaffoldBackgroundColor: const Color.fromARGB(255, 51, 42, 55), // Latar belakang gelap
+          primaryColor: const Color.fromARGB(255, 113, 2, 132), // Warna utama
+          colorScheme: const ColorScheme.dark(
+            primary: Color.fromARGB(255, 205, 157, 213), // Warna elemen utama
+            secondary: Color.fromARGB(255, 59, 30, 109), // Warna elemen sekunder
+          ),
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(color: Color.fromARGB(255, 255, 255, 255)), // Warna teks utama
+            bodyMedium: TextStyle(color: Color.fromARGB(179, 183, 183, 183)), // Warna teks sekunder
+          ),
+          fontFamily: "SourGummy",
         ),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Color.fromARGB(255, 255, 255, 255)), // Warna teks utama
-          bodyMedium: TextStyle(color: Color.fromARGB(179, 183, 183, 183)), // Warna teks sekunder
-        ),
-        fontFamily: "SourGummy",
-      ),
       themeMode: _themeMode, // Terapkan tema berdasarkan pilihan
       home: OnboardingScreen(onThemeChanged: _updateThemeMode),
     );

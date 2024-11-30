@@ -4,7 +4,6 @@ import 'package:fp_tekber_kel4_notes/screens/myapp_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final Function(ThemeMode) onThemeChanged;
-
   const OnboardingScreen({Key? key, required this.onThemeChanged})
       : super(key: key);
 
@@ -66,8 +65,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: theme.brightness == Brightness.dark
-                ? [Colors.grey.shade900, Colors.grey.shade800] // Warna untuk dark mode
-                : [Colors.yellow.shade100, Colors.yellow.shade300], // Warna untuk light mode
+              ? [Colors.grey.shade900, Colors.grey.shade800] // Warna untuk dark mode
+              : [Colors.yellow.shade100, Colors.yellow.shade300], // Warna untuk light mode
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -163,23 +162,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(
-                      255, 189, 117, 202), // Button color changed
-                  foregroundColor: Colors.white, // Font color remains white
+                  backgroundColor: const Color.fromARGB( 255, 189, 117, 202), 
+                  foregroundColor: Colors.white, 
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  elevation: 5, // Add shadow effect
-                  shadowColor: Colors.black54, // Shadow hint color
+                  elevation: 5, 
+                  shadowColor: Colors.black54, 
                 ),
                 child: const Text(
                   'Start Take Your Notes',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                  ),
+                ),
               ),
             ),
           ],

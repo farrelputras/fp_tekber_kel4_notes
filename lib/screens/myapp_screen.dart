@@ -173,7 +173,7 @@ class MyAppScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'My Task',
+                          'My Tasks',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

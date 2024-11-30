@@ -145,11 +145,43 @@ class _MyTaskScreenState extends State<MyTaskScreen> {
     );
   }
 
-  // Fungsi untuk menghapus tugas
-  void _deleteTask(int index) {
-    setState(() {
-      _tasks.removeAt(index);
-    });
+  // Fungsi untuk konfirmasi sebelum menghapus
+  void _confirmDeleteTask(int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: const Text('Delete Task'),
+          content: const Text(
+            'Are you sure you want to delete this task?\nThis action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _tasks.removeAt(index); // Hapus tugas
+                });
+                Navigator.of(context).pop(); // Tutup dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Task has been successfully deleted.'),
+                  ),
+                );
+              },
+              child: const Text('Delete'),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Fungsi untuk toggle selesai/tidak selesai
@@ -259,7 +291,7 @@ class _MyTaskScreenState extends State<MyTaskScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteTask(index),
+                        onPressed: () => _confirmDeleteTask(index), // Konfirmasi sebelum hapus
                       ),
                     ],
                   ),

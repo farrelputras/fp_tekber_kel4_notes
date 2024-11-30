@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'add_task_screen.dart';
 
 class MyTaskScreen extends StatelessWidget {
   const MyTaskScreen({super.key});
@@ -50,11 +51,14 @@ class MyTaskScreen extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Tambahkan fungsi untuk menambah tugas
-        },
-        backgroundColor: Colors.purple,
-        child: const Icon(Icons.add, color: Colors.white),
+           onPressed: () {
+             showDialog(
+            context: context,
+            builder: (context) => AddTaskScreen(),
+             );
+              },
+           backgroundColor: Colors.purple,
+           child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

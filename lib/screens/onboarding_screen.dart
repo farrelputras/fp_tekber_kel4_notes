@@ -2,18 +2,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fp_tekber_kel4_notes/screens/myapp_screen.dart';
 
-
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+  final Function(ThemeMode) onThemeChanged;
+
+  const OnboardingScreen({Key? key, required this.onThemeChanged})
+      : super(key: key);
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  double _progress = 0; // Progress value
-  bool _showButton = false; // Control visibility of the button
-  int _currentImageIndex = 0; // Current image index
+  double _progress = 0; // Nilai progress
+  bool _showButton = false; // Tombol "Get Started" tampil jika true
+  int _currentImageIndex = 0; // Indeks gambar saat ini
   late Timer _timer;
 
   final List<String> _imagePaths = [
@@ -25,33 +27,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    _startLoading(); // Start progress bar animation
-    _startImageRotation(); // Start image rotation animation
+    _startLoading(); // Jalankan animasi progress bar
+    _startImageRotation(); // Animasi rotasi gambar
   }
 
   @override
   void dispose() {
-    _timer.cancel(); // Cancel timer when screen is disposed
+    _timer.cancel(); // Hentikan timer saat screen ditutup
     super.dispose();
   }
 
   void _startLoading() async {
-    // Simulate the progress bar filling up
     for (int i = 1; i <= 10; i++) {
-      await Future.delayed(const Duration(milliseconds: 300)); // Delay per step
+      await Future.delayed(const Duration(milliseconds: 300));
       setState(() {
-        _progress = i / 10; // Update progress
+        _progress = i / 10; // Perbarui progress
       });
     }
-
-    // Show the "Get Started" button
     setState(() {
-      _showButton = true;
+      _showButton = true; // Tampilkan tombol setelah loading selesai
     });
   }
 
   void _startImageRotation() {
-    // Timer to change images every 1.5 seconds
     _timer = Timer.periodic(const Duration(milliseconds: 1500), (timer) {
       setState(() {
         _currentImageIndex = (_currentImageIndex + 1) % _imagePaths.length;
@@ -61,15 +59,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // Ambil tema aktif
     return Scaffold(
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Colors.yellow.shade100,
-              Colors.yellow.shade300,
-            ],
+            colors: theme.brightness == Brightness.dark
+                ? [Colors.grey.shade900, Colors.grey.shade800] // Warna untuk dark mode
+                : [Colors.yellow.shade100, Colors.yellow.shade300], // Warna untuk light mode
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -79,12 +77,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: [
             // Rotating Image
             AnimatedSwitcher(
-              duration: const Duration(milliseconds: 800), // Smooth transition
+              duration: const Duration(milliseconds: 800),
               child: Image.asset(
                 _imagePaths[_currentImageIndex],
                 key: ValueKey<int>(_currentImageIndex),
                 fit: BoxFit.cover,
-                width: 150, // Adjusted size to fit the layout
+                width: 150,
                 height: 150,
               ),
             ),
@@ -93,20 +91,39 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             // Text "Welcome to Notes App!"
             const Text(
               'Welcome to EduNotes!',
-              style: TextStyle(
+                style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Manage ur academics note with EduNotes! \n An easy way to learn!',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.black54,
-              ),
+            Text(
+              'Manage your academic notes with EduNotes! \nAn easy way to learn!',
+              style: theme.textTheme.bodyMedium?.copyWith(fontSize: 18),
               textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 30),
+
+            // Theme Mode Buttons
+            const Text(
+              "Choose your theme:",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => widget.onThemeChanged(ThemeMode.light),
+              child: const Text("Light Mode"),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => widget.onThemeChanged(ThemeMode.dark),
+              child: const Text("Dark Mode"),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () => widget.onThemeChanged(ThemeMode.system),
+              child: const Text("System Default"),
             ),
             const SizedBox(height: 30),
 
@@ -124,11 +141,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 300),
-                      width: 250 * _progress, // Animate width based on progress
+                      width: 250 * _progress,
                       height: 8,
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(
-                            255, 189, 117, 202), // Progress bar color changed
+                        color: const Color.fromARGB(255, 189, 117, 202),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -136,7 +152,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
 
-            if (_showButton)
+              if (_showButton)
               // "Get Started" Button (visible after progress bar finishes)
               ElevatedButton(
                 onPressed: () {
@@ -164,8 +180,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
-                ),
               ),
+            ),
           ],
         ),
       ),

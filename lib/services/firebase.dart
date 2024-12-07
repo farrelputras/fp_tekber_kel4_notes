@@ -6,9 +6,10 @@ class FirestoreService {
       FirebaseFirestore.instance.collection('notes');
 
   //CREATE
-  Future<void> addNote(String note) {
+  Future<void> addNote(String note, String content) {
     return notes.add({
       'note': note,
+      'content':content,
       'timestamp': Timestamp.now(),
     });
   }

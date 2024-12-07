@@ -137,7 +137,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   // Aksi ketika tombol "Save" ditekan
                   String title = titleController.text.trim();
                   String notes = noteController.text.trim();
@@ -145,10 +145,10 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                   if (title.isNotEmpty &&
                       notes.isNotEmpty) {
                     // Simpan catatan
+                    await firestoreService.addNote(title,notes);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Note saved!')),
                     );
-                    firestoreService.addNote(noteController.text);
                     Navigator.pop(context); // Kembali ke layar sebelumnya
                   } else {
                     // Tampilkan pesan error

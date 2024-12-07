@@ -86,10 +86,41 @@ class _QuickNotesSimpleState extends State<QuickNotesSimple> {
 
                         Map<String, dynamic> data =
                             document.data() as Map<String, dynamic>;
-                        String noteText = data['note'];
 
-                        return ListTile(
-                          title: Text(noteText),
+                        // Ambil data: title, content, dan timestamp
+                        String note = data['note'] ?? 'Untitled';
+                        String content = data['content'] ?? 'No content';
+                        Timestamp timestamp = data['timestamp'];
+                        DateTime dateTime = timestamp.toDate();
+                        String formattedDate =
+                            '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: ListTile(
+                            title: Text(
+                              note,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(content,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis),
+                                const SizedBox(height: 4),
+                                Text(
+                                  formattedDate,
+                                  style: const TextStyle(
+                                      color: Colors.grey, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              // Aksi ketika item diklik (opsional)
+                            },
+                          ),
                         );
                       },
                     );

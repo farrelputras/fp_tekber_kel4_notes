@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fp_tekber_kel4_notes/screens/quicknotes_simple_screen.dart';
 import 'quicknotes.dart'; // Impor halaman Quick Notes
 import 'my_folder_screen.dart'; // Impor halaman My Folder
 import 'my_task_screen.dart'; // Impor halaman My Task
@@ -68,7 +69,7 @@ class MyAppScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const QuickNotes()),
+                  MaterialPageRoute(builder: (context) => const QuickNotesSimple()),
                 );
               },
               child: Container(

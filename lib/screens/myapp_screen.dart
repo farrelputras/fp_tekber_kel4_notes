@@ -110,6 +110,7 @@ class MyAppScreen extends StatelessWidget {
                           'Quick Notes',
                           style: TextStyle(
                             fontSize: 16,
+                            color: Color.fromARGB(255, 0, 0, 0),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -177,6 +178,7 @@ class MyAppScreen extends StatelessWidget {
                           'My Tasks',
                           style: TextStyle(
                             fontSize: 16,
+                            color: Color.fromARGB(255, 0, 0, 0),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -246,6 +248,7 @@ class MyAppScreen extends StatelessWidget {
                           'My Folder',
                           style: TextStyle(
                             fontSize: 16,
+                            color: Color.fromARGB(255, 0, 0, 0),
                             fontWeight: FontWeight.bold,
                           ),
                         ),

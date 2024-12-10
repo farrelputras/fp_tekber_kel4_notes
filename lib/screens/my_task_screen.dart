@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Untuk format tanggal
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'add_task_screen.dart';
+import 'task_detail_screen.dart';
+import '../services/tasks_firebase.dart';
 
 class MyTaskScreen extends StatefulWidget {
   const MyTaskScreen({Key? key}) : super(key: key);
@@ -9,186 +13,22 @@ class MyTaskScreen extends StatefulWidget {
 }
 
 class _MyTaskScreenState extends State<MyTaskScreen> {
-  final List<Map<String, dynamic>> _tasks = []; // Daftar tugas
+  final TasksFirebase _tasksFirebase = TasksFirebase();
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
-  // Fungsi untuk menampilkan pop-up form
-  void _showTaskForm({Map<String, dynamic>? existingTask, int? index}) {
-    final _titleController = TextEditingController(
-      text: existingTask?['title'] ?? '', // Isi dengan data jika mengedit
-    );
-    DateTime? _selectedDate = existingTask?['dueDate'];
-    String? _difficulty = existingTask?['difficulty'];
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: Text(existingTask == null ? 'Add Task' : 'Edit Task'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Input untuk judul tugas
-              TextField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Input untuk tanggal dengan ikon kalender
-              GestureDetector(
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: _selectedDate ?? DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2100),
-                  );
-                  if (pickedDate != null) {
-                    setState(() {
-                      _selectedDate = pickedDate;
-                    });
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _selectedDate == null
-                            ? 'Select Due Date'
-                            : DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                        style: TextStyle(
-                          color: _selectedDate == null ? Colors.grey : Colors.black,
-                        ),
-                      ),
-                      const Icon(Icons.calendar_today, size: 20, color: Colors.grey),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Dropdown untuk kesulitan tugas
-              DropdownButtonFormField<String>(
-                value: _difficulty,
-                decoration: const InputDecoration(
-                  labelText: 'Difficulty',
-                  border: OutlineInputBorder(),
-                ),
-                items: ['Easy', 'Medium', 'Hard']
-                    .map((level) => DropdownMenuItem(
-                          value: level,
-                          child: Text(level),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _difficulty = value;
-                  });
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (_titleController.text.isEmpty ||
-                    _selectedDate == null ||
-                    _difficulty == null) {
-                  // Validasi: Pastikan semua field terisi
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('All fields are required!'),
-                    ),
-                  );
-                  return;
-                }
-
-                final newTask = {
-                  'title': _titleController.text,
-                  'dueDate': _selectedDate,
-                  'difficulty': _difficulty,
-                  'isCompleted': false, // Default: Belum selesai
-                };
-
-                setState(() {
-                  if (existingTask == null) {
-                    _tasks.add(newTask); // Tambahkan tugas baru
-                  } else {
-                    _tasks[index!] = newTask; // Perbarui tugas lama
-                  }
-                });
-
-                Navigator.of(context).pop(); // Tutup dialog
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Fungsi untuk konfirmasi sebelum menghapus
-  void _confirmDeleteTask(int index) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: const Text('Delete Task'),
-          content: const Text(
-            'Are you sure you want to delete this task?\nThis action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _tasks.removeAt(index); // Hapus tugas
-                });
-                Navigator.of(context).pop(); // Tutup dialog
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Task has been successfully deleted.'),
-                  ),
-                );
-              },
-              child: const Text('Delete'),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Fungsi untuk toggle selesai/tidak selesai
-  void _toggleTaskCompletion(int index) {
-    setState(() {
-      _tasks[index]['isCompleted'] = !_tasks[index]['isCompleted'];
-    });
+  // Fungsi untuk mengubah angka kesulitan menjadi label
+  String _getDifficultyLabel(int difficulty) {
+    switch (difficulty) {
+      case 1:
+        return "Easy";
+      case 2:
+        return "Medium";
+      case 3:
+        return "Hard";
+      default:
+        return "Unknown";
+    }
   }
 
   @override
@@ -199,109 +39,127 @@ class _MyTaskScreenState extends State<MyTaskScreen> {
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          'My Tasks',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          "My Tasks",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: _tasks.isEmpty
-          ? const Center(
-              child: Text(
-                'No tasks added yet!',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
+      body: Column(
+        children: [
+          // Search bar
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
+              },
+              decoration: InputDecoration(
+                hintText: "Search tasks...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _tasks.length,
-              itemBuilder: (context, index) {
-                final task = _tasks[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: task['isCompleted'] ? Colors.green.shade100 : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        spreadRadius: 2,
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
+            ),
+          ),
+          Expanded(
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _tasksFirebase.readAllTasks(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text("No tasks found!"));
+                }
+
+                final tasks = snapshot.data!
+                    .where((task) => task['name']
+                        .toString()
+                        .toLowerCase()
+                        .contains(_searchQuery))
+                    .toList();
+
+                if (tasks.isEmpty) {
+                  return const Center(child: Text("No matching tasks found."));
+                }
+
+                return ListView.builder(
+                  itemCount: tasks.length,
+                  itemBuilder: (context, index) {
+                    final task = tasks[index];
+                    final dueDate = (task['due_date'] as Timestamp).toDate();
+                    final difficultyLabel =
+                        _getDifficultyLabel(task['difficulty']);
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Checkbox(
-                        value: task['isCompleted'],
-                        onChanged: (value) => _toggleTaskCompletion(index),
-                        activeColor: Colors.green,
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              task['title'],
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                decoration: task['isCompleted']
-                                    ? TextDecoration.lineThrough
-                                    : null,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Due: ${DateFormat('dd/MM/yyyy').format(task['dueDate'])}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: task['isCompleted']
-                                    ? Colors.grey.shade700
-                                    : Colors.black54,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              task['difficulty'],
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: task['difficulty'] == 'Easy'
-                                    ? Colors.green
-                                    : task['difficulty'] == 'Medium'
-                                        ? Colors.orange
-                                        : Colors.red,
-                              ),
-                            ),
-                          ],
+                      child: ListTile(
+                        title: Text(
+                          task['name'],
+                          style: TextStyle(
+                            decoration: task['completed']
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                          ),
                         ),
+                        subtitle: Text(
+                          'Due Date: ${DateFormat('dd/MM/yyyy').format(dueDate)}\nDifficulty: $difficultyLabel',
+                        ),
+                        trailing: Checkbox(
+                          value: task['completed'],
+                          onChanged: (value) {
+                            _tasksFirebase.updateTask(
+                              taskId: task['taskId'],
+                              completed: value,
+                            );
+                          },
+                        ),
+                        // Navigasi ke TaskDetailScreen saat item diklik
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TaskDetailScreen(
+                                taskId: task['taskId'],
+                                taskName: task['name'],
+                                difficulty: task['difficulty'],
+                                dueDate: dueDate,
+                                completed: task['completed'],
+                              ),
+                            ),
+                          );
+                        },
+                        onLongPress: () {
+                          _tasksFirebase.deleteTask(task['taskId']);
+                        },
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _showTaskForm(existingTask: task, index: index),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _confirmDeleteTask(index), // Konfirmasi sebelum hapus
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 );
               },
             ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showTaskForm(),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => AddTaskScreen(),
+          );
+        },
         backgroundColor: Colors.purple,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add),
       ),
     );
   }

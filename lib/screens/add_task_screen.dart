@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/tasks_firebase.dart';
 
 class AddTaskScreen extends StatefulWidget {
   @override
@@ -6,18 +7,21 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
+  final TasksFirebase _tasksFirebase = TasksFirebase();
   final TextEditingController _titleController = TextEditingController();
   DateTime? _dueDate;
   String? _selectedLevel;
 
   final List<Map<String, dynamic>> _levels = [
-    {'label': 'Easy', 'color': Colors.green},
-    {'label': 'Medium', 'color': Colors.orange},
-    {'label': 'Hard', 'color': Colors.red},
+    {'label': 'Easy', 'value': 1},
+    {'label': 'Medium', 'value': 2},
+    {'label': 'Hard', 'value': 3},
   ];
 
   bool get _isFormValid =>
-      _titleController.text.isNotEmpty && _dueDate != null && _selectedLevel != null;
+      _titleController.text.isNotEmpty &&
+      _dueDate != null &&
+      _selectedLevel != null;
 
   Future<void> _pickDate() async {
     final now = DateTime.now();
@@ -34,47 +38,41 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _titleController.dispose();
-    super.dispose();
+  void _saveTask() {
+    if (!_isFormValid) return;
+
+    final difficulty = _levels
+        .firstWhere((level) => level['label'] == _selectedLevel)['value'] as int;
+
+    _tasksFirebase.createTask(
+      name: _titleController.text,
+      difficulty: difficulty,
+      dueDate: _dueDate!,
+    );
+
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF9F5F0),
-          borderRadius: BorderRadius.circular(20),
-        ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
               "Add New Task",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF3A3A3A),
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
                 labelText: "Title",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                filled: true,
-                fillColor: Colors.white,
+                border: OutlineInputBorder(),
               ),
-              onChanged: (value) => setState(() {}),
             ),
             const SizedBox(height: 16),
             GestureDetector(
@@ -83,12 +81,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 child: TextField(
                   decoration: InputDecoration(
                     labelText: "Due Date",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    suffixIcon: const Icon(Icons.calendar_today, color: Colors.grey),
+                    border: OutlineInputBorder(),
+                    suffixIcon: const Icon(Icons.calendar_today),
                   ),
                   controller: TextEditingController(
                     text: _dueDate == null
@@ -102,30 +96,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             DropdownButtonFormField<String>(
               value: _selectedLevel,
               decoration: InputDecoration(
-                labelText: "Level",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                filled: true,
-                fillColor: Colors.white,
+                labelText: "Difficulty",
+                border: OutlineInputBorder(),
               ),
               items: _levels.map((level) {
                 return DropdownMenuItem<String>(
                   value: level['label'],
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        margin: const EdgeInsets.only(right: 8),
-                        decoration: BoxDecoration(
-                          color: level['color'],
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      Text(level['label']),
-                    ],
-                  ),
+                  child: Text(level['label']),
                 );
               }).toList(),
               onChanged: (value) {
@@ -136,26 +113,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _isFormValid
-                  ? () {
-                      Navigator.of(context).pop();
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _isFormValid ? const Color(0xFFB085D6) : Colors.grey,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: const Text(
-                "Save",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
+              onPressed: _isFormValid ? _saveTask : null,
+              child: const Text("Save"),
             ),
           ],
         ),
@@ -163,33 +122,3 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     );
   }
 }
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text("My Tasks"),
-          backgroundColor: const Color(0xFFFFD966),
-        ),
-        body: Center(
-          child: const Text("Task List"),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => AddTaskScreen(),
-            );
-          },
-          backgroundColor: Colors.purple,
-          child: const Icon(Icons.add, color: Colors.white),
-        ),
-      ),
-    );
-  }
-}
-
-void main() => runApp(MyApp());

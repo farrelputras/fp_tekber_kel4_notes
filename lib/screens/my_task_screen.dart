@@ -32,35 +32,68 @@ class _MyTaskScreenState extends State<MyTaskScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 243, 132),
+        backgroundColor: const Color.fromARGB(255, 255, 243, 132), // Warna kuning terang
         elevation: 0,
         centerTitle: true,
         title: const Text(
           "My Tasks",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black), // Ikon hitam
       ),
       body: Column(
         children: [
           // Search bar
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value.toLowerCase();
-                });
-              },
-              decoration: InputDecoration(
-                hintText: "Search tasks...",
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey.shade800
+                    : Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value.toLowerCase();
+                  });
+                },
+                style: TextStyle(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
+                ),
+                cursorColor: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+                decoration: InputDecoration(
+                  isCollapsed: true,
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white54
+                        : Colors.black54,
+                  ),
+                  hintText: 'Search tasks...',
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white54
+                        : Colors.black54,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 ),
               ),
             ),
@@ -100,8 +133,10 @@ class _MyTaskScreenState extends State<MyTaskScreen> {
                           horizontal: 8, vertical: 4),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? const Color.fromARGB(255, 0, 0, 0)
+                            : Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: ListTile(
                         title: Text(

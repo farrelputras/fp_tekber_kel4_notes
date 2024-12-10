@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/firebase.dart';
+import '../services/folders_database.dart';
 
 class AddFolderScreen extends StatefulWidget {
   const AddFolderScreen({Key? key}) : super(key: key);
@@ -10,23 +13,26 @@ class AddFolderScreen extends StatefulWidget {
 class _AddFolderScreenState extends State<AddFolderScreen> {
   final TextEditingController _folderNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final Set<String> _selectedNotes = {};
+  final FirestoreService firestoreService = FirestoreService();
 
-  String? _folderNameError;
-  String? _descriptionError;
+  bool _isLoading = false;
 
-  // Fungsi untuk validasi dan menyimpan folder
-  void _saveFolder() {
-    setState(() {
-      _folderNameError = _folderNameController.text.isEmpty ? "Folder name cannot be empty" : null;
-      _descriptionError = _descriptionController.text.isEmpty ? "Description cannot be empty" : null;
-    });
+  Future<void> _saveFolder() async {
+    setState(() => _isLoading = true);
 
-    if (_folderNameError == null && _descriptionError == null) {
-      // Jika validasi berhasil, data bisa dikembalikan ke screen sebelumnya
-      Navigator.pop(context, {
-        "name": _folderNameController.text,
-        "description": _descriptionController.text,
-      });
+    try {
+      await FoldersDatabase().addFolder(
+        _folderNameController.text,
+        _descriptionController.text,
+        _selectedNotes.toList(),
+      );
+
+      Navigator.pop(context, true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to save folder: $e")));
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -53,59 +59,64 @@ class _AddFolderScreenState extends State<AddFolderScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Input Folder Name
             TextField(
               controller: _folderNameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Folder Name",
-                errorText: _folderNameError,
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-
-            // Input Description
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Description",
-                errorText: _descriptionError,
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-
-            // Choose Your Notes
             const Text(
               "Choose Your Notes",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-
-            // List of Notes with Checkboxes
             Expanded(
-              child: ListView(
-                children: [
-                  CheckboxListTile(
-                    value: true,
-                    onChanged: (value) {},
-                    title: const Text("Catetan MRTI"),
-                  ),
-                  CheckboxListTile(
-                    value: false,
-                    onChanged: (value) {},
-                    title: const Text("Catetan Tekber"),
-                  ),
-                  CheckboxListTile(
-                    value: false,
-                    onChanged: (value) {},
-                    title: const Text("Catetan PSTI"),
-                  ),
-                ],
+              child: StreamBuilder(
+                stream: firestoreService.getNotesStream(),
+                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasData) {
+                    final notes = snapshot.data!.docs;
+
+                    return ListView.builder(
+                      itemCount: notes.length,
+                      itemBuilder: (context, index) {
+                        final note = notes[index];
+                        final noteId = note.id;
+                        final noteTitle = note['note'];
+
+                        return CheckboxListTile(
+                          value: _selectedNotes.contains(noteId),
+                          onChanged: (isChecked) {
+                            setState(() {
+                              if (isChecked == true) {
+                                _selectedNotes.add(noteId);
+                              } else {
+                                _selectedNotes.remove(noteId);
+                              }
+                            });
+                          },
+                          title: Text(noteTitle),
+                        );
+                      },
+                    );
+                  } else if (snapshot.hasError) {
+                    return const Center(child: Text("Failed to load notes."));
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
               ),
             ),
-
-            // Save Button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,

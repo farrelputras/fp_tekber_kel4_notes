@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/folders_database.dart';
 import 'add_folder_screen.dart';
+import 'folder_detail_screen.dart';
 
 class MyFolderScreen extends StatefulWidget {
   const MyFolderScreen({Key? key}) : super(key: key);
@@ -9,116 +12,110 @@ class MyFolderScreen extends StatefulWidget {
 }
 
 class _MyFolderScreenState extends State<MyFolderScreen> {
-  final List<Map<String, String>> folders = []; // List untuk menyimpan folder
-
-  // Tambahkan folder dari AddFolderScreen
-  void _navigateToAddFolderScreen() async {
-    final newFolder = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AddFolderScreen()),
-    );
-
-    if (newFolder != null) {
-      setState(() {
-        folders.add(newFolder);
-      });
-    }
-  }
-
-  // Hapus folder
-  void _deleteFolder(int index) {
-    setState(() {
-      folders.removeAt(index);
-    });
-  }
+  final FoldersDatabase foldersDatabase = FoldersDatabase();
+  final TextEditingController searchController = TextEditingController();
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 255, 243, 132),
-        elevation: 0,
         title: const Text(
-          'My Folder',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          'My Folders',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: folders.isEmpty
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'No folder yet',
-                      style: TextStyle(color: Colors.black54, fontSize: 16),
-                    ),
-                  ],
+        child: Column(
+          children: [
+            // Search Bar
+            Container(
+              margin: const EdgeInsets.only(bottom: 16.0),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TextField(
+                controller: searchController,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.search),
+                  hintText: "Search Your Folder",
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.all(12),
                 ),
-              )
-            : Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.search),
-                        hintText: "Search Your Folder",
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(12),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView.builder(
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value.toLowerCase();
+                  });
+                },
+              ),
+            ),
+            // Folder List
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: foldersDatabase.getFolders(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final folders = snapshot.data!.docs.where((doc) {
+                      final name = doc['name'].toString().toLowerCase();
+                      return name.contains(searchQuery);
+                    }).toList();
+
+                    if (folders.isEmpty) {
+                      return const Center(
+                        child: Text('No folders available.'),
+                      );
+                    }
+
+                    return ListView.builder(
                       itemCount: folders.length,
                       itemBuilder: (context, index) {
+                        final folder = folders[index];
+                        final folderId = folder.id;
+
                         return Card(
-                          margin: const EdgeInsets.only(bottom: 12.0),
+                          margin: const EdgeInsets.symmetric(vertical: 8),
                           child: ListTile(
                             leading: Image.asset('assets/folder.png', width: 40),
-                            title: Text(folders[index]["name"] ?? "Unnamed Folder"),
-                            subtitle: Text(folders[index]["description"] ?? ""),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () {
-                                    // Tambahkan logika edit jika diperlukan
-                                  },
+                            title: Text(folder['name']),
+                            subtitle: Text(folder['description']),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      FolderDetailsScreen(folderId: folderId),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () => _deleteFolder(index),
-                                ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                         );
                       },
-                    ),
-                  ),
-                ],
+                    );
+                  } else if (snapshot.hasError) {
+                    return const Center(
+                      child: Text('Error loading folders.'),
+                    );
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
               ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToAddFolderScreen,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddFolderScreen()),
+          );
+        },
         backgroundColor: Colors.purple,
         child: const Icon(Icons.add),
       ),

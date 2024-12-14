@@ -148,6 +148,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   onPressed: _updateTask,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple,
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -158,7 +159,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             ),
           ),
           Positioned(
-            bottom: 16,
+            bottom: 8,
             right: 16,
             child: FloatingActionButton(
               onPressed: () async {

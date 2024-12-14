@@ -17,7 +17,6 @@ class _MyTaskScreenState extends State<MyTaskScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // Fungsi untuk mengubah angka kesulitan menjadi label
   String _getDifficultyLabel(int difficulty) {
     switch (difficulty) {
       case 1:
@@ -41,25 +40,26 @@ class _MyTaskScreenState extends State<MyTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 255, 243, 132), // Warna kuning terang
+        backgroundColor: const Color.fromARGB(255, 255, 243, 132),
         elevation: 0,
         centerTitle: true,
         title: const Text(
           "My Tasks",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        iconTheme: const IconThemeData(color: Colors.black), // Ikon hitam
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Column(
-        children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            // Search bar
+            Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey.shade800
-                    : Colors.grey.shade200,
+                color: Colors.grey.shade200,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TextField(
@@ -69,122 +69,141 @@ class _MyTaskScreenState extends State<MyTaskScreen> {
                     _searchQuery = value.toLowerCase();
                   });
                 },
-                style: TextStyle(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                ),
-                cursorColor: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
                 decoration: InputDecoration(
-                  isCollapsed: true,
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white54
-                        : Colors.black54,
-                  ),
+                  prefixIcon: const Icon(Icons.search, color: Colors.black54),
                   hintText: 'Search tasks...',
-                  hintStyle: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white54
-                        : Colors.black54,
-                  ),
                   border: InputBorder.none,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 12, horizontal: 16),
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: _tasksFirebase.readAllTasks(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text("No tasks found!"),
+                    );
+                  }
+
+                  final tasks = snapshot.data!
+                      .where((task) => task['name']
+                          .toString()
+                          .toLowerCase()
+                          .contains(_searchQuery))
+                      .toList();
+
+                  if (tasks.isEmpty) {
+                    return const Center(
+                      child: Text("No matching tasks found."),
+                    );
+                  }
+
+                  return ListView.builder(
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = tasks[index];
+                      final dueDate = (task['due_date'] as Timestamp).toDate();
+                      final difficultyLabel =
+                          _getDifficultyLabel(task['difficulty']);
+
+                      return Card(
+  elevation: 1,
+  color: Theme.of(context).brightness == Brightness.dark
+      ? Colors.black // Warna Card hitam untuk dark mode
+      : const Color(0xFFF9F3E5), // Warna Card untuk light mode
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+  ),
+  margin: const EdgeInsets.symmetric(vertical: 8),
+  child: InkWell(
+    borderRadius: BorderRadius.circular(12), // Efek hover mencakup border radius
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TaskDetailScreen(
+            taskId: task['taskId'],
+            taskName: task['name'],
+            difficulty: task['difficulty'],
+            dueDate: dueDate,
+            completed: task['completed'],
           ),
-          Expanded(
-            child: StreamBuilder<List<Map<String, dynamic>>>(
-              stream: _tasksFirebase.readAllTasks(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("No tasks found!"));
-                }
-
-                final tasks = snapshot.data!
-                    .where((task) => task['name']
-                        .toString()
-                        .toLowerCase()
-                        .contains(_searchQuery))
-                    .toList();
-
-                if (tasks.isEmpty) {
-                  return const Center(child: Text("No matching tasks found."));
-                }
-
-                return ListView.builder(
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    final task = tasks[index];
-                    final dueDate = (task['due_date'] as Timestamp).toDate();
-                    final difficultyLabel =
-                        _getDifficultyLabel(task['difficulty']);
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? const Color.fromARGB(255, 0, 0, 0)
-                            : Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        title: Text(
-                          task['name'],
-                          style: TextStyle(
-                            decoration: task['completed']
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
+        ),
+      );
+    },
+    onLongPress: () {
+      _tasksFirebase.deleteTask(task['taskId']);
+    },
+    child: ListTile(
+      contentPadding: const EdgeInsets.all(12),
+      title: Text(
+        task['name'],
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white // Warna font putih di dark mode
+              : Colors.black87, // Warna font di light mode
+        ),
+      ),
+      subtitle: Text(
+        'Due Date: ${DateFormat('dd/MM/yyyy').format(dueDate)}\n'
+        'Difficulty: $difficultyLabel',
+        style: TextStyle(
+          fontSize: 14,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white70 // Warna font di dark mode
+              : Colors.black54, // Warna font di light mode
+        ),
+      ),
+      trailing: Checkbox(
+        value: task['completed'],
+        activeColor: Colors.purple,
+        checkColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Border checkbox hitam di dark mode
+            : Colors.white, // Border checkbox putih di light mode
+        onChanged: (value) {
+          _tasksFirebase.updateTask(
+            taskId: task['taskId'],
+            completed: value,
+                                );
+                              },
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TaskDetailScreen(
+                                    taskId: task['taskId'],
+                                    taskName: task['name'],
+                                    difficulty: task['difficulty'],
+                                    dueDate: dueDate,
+                                    completed: task['completed'],
+                                  ),
+                                ),
+                              );
+                            },
+                            onLongPress: () {
+                              _tasksFirebase.deleteTask(task['taskId']);
+                            },
                           ),
                         ),
-                        subtitle: Text(
-                          'Due Date: ${DateFormat('dd/MM/yyyy').format(dueDate)}\nDifficulty: $difficultyLabel',
-                        ),
-                        trailing: Checkbox(
-                          value: task['completed'],
-                          onChanged: (value) {
-                            _tasksFirebase.updateTask(
-                              taskId: task['taskId'],
-                              completed: value,
-                            );
-                          },
-                        ),
-                        // Navigasi ke TaskDetailScreen saat item diklik
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TaskDetailScreen(
-                                taskId: task['taskId'],
-                                taskName: task['name'],
-                                difficulty: task['difficulty'],
-                                dueDate: dueDate,
-                                completed: task['completed'],
-                              ),
-                            ),
-                          );
-                        },
-                        onLongPress: () {
-                          _tasksFirebase.deleteTask(task['taskId']);
-                        },
-                      ),
-                    );
-                  },
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -194,6 +213,7 @@ class _MyTaskScreenState extends State<MyTaskScreen> {
           );
         },
         backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),
     );

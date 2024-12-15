@@ -27,19 +27,21 @@ class FoldersDatabase {
     }
   }
 
-  // Dapatkan stream notes dalam folder
-  Stream<List<DocumentSnapshot>> getNotesInFolder(String folderId) async* {
-    final folder = await foldersCollection.doc(folderId).get();
-    if (folder.exists) {
-      List<String> notesIds = List<String>.from(folder['notes'] ?? []);
-      yield* FirebaseFirestore.instance
-          .collection('notes')
-          .where(FieldPath.documentId, whereIn: notesIds)
-          .snapshots()
-          .map((snapshot) => snapshot.docs);
-    } else {
-      yield [];
-    }
+  // Perbaikan: Stream notes dalam folder
+  Stream<List<DocumentSnapshot>> getNotesInFolder(String folderId) {
+    return foldersCollection.doc(folderId).snapshots().asyncMap((folderSnapshot) async {
+      if (folderSnapshot.exists) {
+        List<String> notesIds = List<String>.from(folderSnapshot['notes'] ?? []);
+        if (notesIds.isEmpty) return [];
+        final notesQuery = await FirebaseFirestore.instance
+            .collection('notes')
+            .where(FieldPath.documentId, whereIn: notesIds)
+            .get();
+        return notesQuery.docs;
+      } else {
+        return [];
+      }
+    });
   }
 
   // Perbarui folder

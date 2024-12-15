@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../services/firebase.dart';
 import '../services/folders_database.dart';
 
 class FolderDetailsScreen extends StatefulWidget {
@@ -16,8 +15,6 @@ class _FolderDetailsScreenState extends State<FolderDetailsScreen> {
   final TextEditingController _folderNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final Set<String> _selectedNotes = {};
-  final FirestoreService firestoreService = FirestoreService();
-
   bool _isLoading = true;
   late Stream<List<DocumentSnapshot>> notesStream;
 
@@ -28,41 +25,55 @@ class _FolderDetailsScreenState extends State<FolderDetailsScreen> {
   }
 
   Future<void> _loadFolderDetails() async {
-    // Load folder data
-    final folder = await FoldersDatabase().getFolderById(widget.folderId);
-    final notesInFolder = await FoldersDatabase().getNotesInFolder(widget.folderId);
+    try {
+      final folder = await FoldersDatabase().getFolderById(widget.folderId);
+      setState(() {
+        _folderNameController.text = folder['name'];
+        _descriptionController.text = folder['description'];
+        _isLoading = false;
+      });
 
-    setState(() {
-      _folderNameController.text = folder['name'];
-      _descriptionController.text = folder['description'];
-      _isLoading = false;
-    });
-
-    // Set notes stream
-    notesStream = FoldersDatabase().getNotesInFolder(widget.folderId);
+      // Set notes stream
+      notesStream = FoldersDatabase().getNotesInFolder(widget.folderId);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error loading folder details: $e")),
+      );
+    }
   }
 
   Future<void> _saveChanges() async {
     setState(() => _isLoading = true);
 
-    // Update folder details
-    await FoldersDatabase().updateFolder(
-      widget.folderId,
-      _folderNameController.text,
-      _descriptionController.text,
-    );
+    try {
+      // Update folder details
+      await FoldersDatabase().updateFolder(
+        widget.folderId,
+        _folderNameController.text,
+        _descriptionController.text,
+      );
 
-    // Update selected notes in folder
-    await FoldersDatabase().updateNotesInFolder(widget.folderId, _selectedNotes);
-
-    setState(() => _isLoading = false);
-
-    Navigator.pop(context, true);
+      // Update selected notes in folder
+      await FoldersDatabase().updateNotesInFolder(widget.folderId, _selectedNotes);
+      Navigator.pop(context, true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving changes: $e")),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   Future<void> _deleteFolder() async {
-    await FoldersDatabase().deleteFolder(widget.folderId);
-    Navigator.pop(context, true);
+    try {
+      await FoldersDatabase().deleteFolder(widget.folderId);
+      Navigator.pop(context, true);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error deleting folder: $e")),
+      );
+    }
   }
 
   @override
@@ -103,7 +114,6 @@ class _FolderDetailsScreenState extends State<FolderDetailsScreen> {
             const SizedBox(height: 16),
             const Text("Notes in Folder", style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            // Display notes that are part of the folder
             StreamBuilder<List<DocumentSnapshot>>(
               stream: notesStream,
               builder: (context, snapshot) {
@@ -116,7 +126,6 @@ class _FolderDetailsScreenState extends State<FolderDetailsScreen> {
                 }
 
                 final notes = snapshot.data!;
-
                 return ListView.builder(
                   shrinkWrap: true,
                   itemCount: notes.length,

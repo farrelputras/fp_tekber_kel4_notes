@@ -75,7 +75,7 @@ class MyAppScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -142,7 +142,7 @@ class MyAppScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -212,7 +212,7 @@ class MyAppScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
+                  color: const Color.fromARGB(255, 255, 255, 255),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(

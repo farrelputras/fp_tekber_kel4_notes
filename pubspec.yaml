@@ -21,6 +21,8 @@ dependencies:
   cloud_firestore: ^5.5.1
   firebase_auth: ^5.3.4
   uuid: ^3.0.7
+  sleek_circular_slider: ^2.0.1
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -38,6 +40,7 @@ flutter:
     - assets\check.png
     - assets\folder.png
     - assets\quicknotes.png
+    - assets\timer.png
 
   fonts:
     - family: SourGummy

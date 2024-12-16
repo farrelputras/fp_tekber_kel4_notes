@@ -5,7 +5,7 @@ import 'package:fp_tekber_kel4_notes/widget/timer_card.dart';
 
 class TimerOptions extends StatelessWidget {
   final List<String> selectableTimes = [
-    "5", "600", "1200", "1500", "1800", "2700",
+    "600", "900", "1200", "1500", "1800", "2700",
   ];
 
   TimerOptions({super.key});

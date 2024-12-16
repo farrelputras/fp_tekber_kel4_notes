@@ -3,19 +3,19 @@ import 'package:intl/intl.dart';
 import '../services/tasks_firebase.dart';
 
 class TaskDetailScreen extends StatefulWidget {
-  final String taskId; // Ganti menjadi String untuk UUID
+  final String taskId; // UUID sebagai ID task
   final String taskName;
   final int difficulty;
   final DateTime dueDate;
-  final bool completed; // Tambahkan parameter ini
+  final bool completed;
 
   const TaskDetailScreen({
     Key? key,
-    required this.taskId, // Ganti menjadi String untuk UUID
+    required this.taskId,
     required this.taskName,
     required this.difficulty,
     required this.dueDate,
-    required this.completed, // Tambahkan parameter ini
+    required this.completed,
   }) : super(key: key);
 
   @override
@@ -28,6 +28,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   late TextEditingController _nameController;
   late int _selectedDifficulty;
   late DateTime _selectedDueDate;
+
+  bool _isHovering = false; // State hover
+  bool _isPressed = false; // State pencet
 
   @override
   void initState() {
@@ -68,7 +71,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     try {
       await _tasksFirebase.updateTask(
-        taskId: widget.taskId, // Gunakan taskId sebagai String UUID
+        taskId: widget.taskId,
         name: _nameController.text,
         difficulty: _selectedDifficulty,
         dueDate: _selectedDueDate,
@@ -158,45 +161,57 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               ],
             ),
           ),
+          // Tombol X dengan efek hover dan pencet
           Positioned(
-            bottom: 8,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: () async {
-                final bool confirm = await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Confirm Delete'),
-                    content: const Text('Are you sure you want to delete this task?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text('Delete'),
-                      ),
-                    ],
-                  ),
-                );
-
-                if (confirm) {
-                  try {
-                    await _tasksFirebase.deleteTask(widget.taskId); // Gunakan taskId sebagai String UUID
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Task deleted successfully!')),
-                    );
-                    Navigator.pop(context); // Tutup layar setelah penghapusan
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to delete task: $e')),
-                    );
-                  }
-                }
+            top: 8,
+            right: 8,
+            child: MouseRegion(
+              onEnter: (_) {
+                setState(() {
+                  _isHovering = true;
+                });
               },
-              backgroundColor: Colors.red,
-              child: const Icon(Icons.delete),
+              onExit: (_) {
+                setState(() {
+                  _isHovering = false;
+                });
+              },
+              child: GestureDetector(
+                onTapDown: (_) {
+                  setState(() {
+                    _isPressed = true;
+                  });
+                },
+                onTapUp: (_) {
+                  setState(() {
+                    _isPressed = false;
+                  });
+                  Navigator.pop(context);
+                },
+                onTapCancel: () {
+                  setState(() {
+                    _isPressed = false;
+                  });
+                },
+                child: Transform.scale(
+                  scale: _isPressed ? 0.9 : 1.0, // Efek "mencet"
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 100),
+                    decoration: BoxDecoration(
+                      color: _isHovering
+                          ? Colors.redAccent.shade100
+                          : Colors.red, // Efek hover
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],

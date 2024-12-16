@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fp_tekber_kel4_notes/screens/pomodoro_screen.dart';
-import 'package:fp_tekber_kel4_notes/pomodoro_service.dart';
 import 'package:fp_tekber_kel4_notes/screens/quicknotes_simple_screen.dart';
-import 'quicknotes.dart'; // Impor halaman Quick Notes
 import 'my_folder_screen.dart'; // Impor halaman My Folder
 import 'my_task_screen.dart'; // Impor halaman My Task
 
@@ -11,8 +9,6 @@ class MyAppScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController searchController = TextEditingController();
-
     return Scaffold(
       // AppBar
       appBar: AppBar(
@@ -34,26 +30,6 @@ class MyAppScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-
-            // Search Bar
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: TextField(
-                controller: searchController,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search, color: Colors.black54),
-                  hintText: 'Search Your Note',
-                  hintStyle: TextStyle(color: Colors.black54),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(12),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 24),
 
             // "My Apps" Text
             const Text(
